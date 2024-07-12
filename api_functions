@@ -1,0 +1,29 @@
+#!/bin/bash
+
+job_sched() {
+  local iot_gateway_id=$1
+
+  local json_payload=$(cat <<EOF
+{
+  "command": "ExtrairLogsProbe",
+  "iot_gateways": [{"id": $iot_gateway_id}],
+  "type": "GATEWAY"
+}
+EOF
+  )
+
+  local response=$(curl -sS --location --request POST "https://api.nubo.ai/iot/v1/jobs" \
+    --header "authorization: Bearer $API_TOKEN" \
+    --header "content-type: application/json" \
+    --data "$json_payload")
+
+  echo "$response" | jq -r '.id'
+}
+
+job_get() {
+  local job_id=$1
+
+  curl -sS --location --request GET "https://api.nubo.ai/iot/v1/jobs/${job_id}" \
+    --header "authorization: Bearer $API_TOKEN" \
+    --header "content-type: application/json"
+}
